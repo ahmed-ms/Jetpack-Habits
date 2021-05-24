@@ -8,5 +8,5 @@ Sometimes you want bullet points:
 - Disabled delete all menu item if habits is empty
 - Abstract (create and update) fragments
 
-Todo
+Todo :
 *Add more icon for habits
