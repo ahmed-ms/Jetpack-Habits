@@ -9,6 +9,7 @@ Extra work :
 - Disabled delete all menu item if habits is empty
 - Abstract (create and update) fragments
 - Add Icon to habit from icons dialog [icondialoglib](https://github.com/maltaisn/icondialoglib)
+
 Todo :
 
 - Fix date and time bugs and validate create and update habit
