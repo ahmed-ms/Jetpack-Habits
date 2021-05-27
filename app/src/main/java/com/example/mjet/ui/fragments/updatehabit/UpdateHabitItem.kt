@@ -13,15 +13,15 @@ import android.view.View
 import android.widget.DatePicker
 import android.widget.TimePicker
 import android.widget.Toast
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.mjet.R
 import com.example.mjet.data.models.Habit
-import com.example.mjet.ui.viewmodels.HabitViewModels
 import com.example.mjet.utils.ActionFragment
 import com.example.mjet.utils.Calculations
+import com.maltaisn.icondialog.IconDialog
+import com.maltaisn.icondialog.IconDialogSettings
+import com.maltaisn.icondialog.data.Icon
 import kotlinx.android.synthetic.main.fragment_create_habit_item.*
 import kotlinx.android.synthetic.main.fragment_update_habit_item.*
 import java.util.*
@@ -47,6 +47,13 @@ class UpdateHabitItem : ActionFragment(R.layout.fragment_update_habit_item),
         btn_confirm_update.setOnClickListener {
             updateHabit()
         }
+        val iconDialog =
+            this.childFragmentManager.findFragmentByTag(ActionFragment.ICON_DIALOG_TAG) as IconDialog?
+                ?: IconDialog.newInstance(IconDialogSettings())
+
+        ub_btn_pickIcon.setOnClickListener {
+            iconDialog.show(childFragmentManager, ICON_DIALOG_TAG)
+        }
 
 
     }
@@ -62,7 +69,7 @@ class UpdateHabitItem : ActionFragment(R.layout.fragment_update_habit_item),
         //Check that the form is complete before submitting data to the database
         if (!(title.isEmpty() || description.isEmpty() || timeStamp.isEmpty() || drawableSelected == 0)) {
             val habit =
-                Habit(args.selectedhabit.id, title, description, timeStamp, drawableSelected)
+                Habit(args.selectedhabit.id,iconID, title, description, timeStamp, drawableSelected)
 
             //add the habit if all the fields are filled
             habitViewModel.updateHabit(habit)
@@ -147,6 +154,19 @@ class UpdateHabitItem : ActionFragment(R.layout.fragment_update_habit_item),
             R.id.nav_delete -> deleteHabit(args.selectedhabit)
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onIconDialogIconsSelected(dialog: IconDialog, icons: List<Icon>) {
+        "Icon: ${icons[0].tags[0]} ".also { up_tv_iconSelected.text = it }
+        val iconIds = icons.map { it.id }
+        val pack = iconDialogIconPack
+        val icon = pack?.getIcon(iconIds[0])
+        iconID = iconIds[0]
+        icon.let {
+            if (it != null) {
+                up_selectedIconView.setImageDrawable(it.drawable)
+            }
+        }
     }
 
     private fun deleteHabit(habit: Habit){

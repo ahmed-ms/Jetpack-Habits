@@ -21,7 +21,11 @@
             tools:listitem="@layout/recycler_habit_item"
             android:layout_alignParentLeft="true" />
 
+
+
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add"

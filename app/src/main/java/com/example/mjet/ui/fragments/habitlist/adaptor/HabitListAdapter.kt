@@ -8,12 +8,12 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mjet.R
 import com.example.mjet.data.models.Habit
-import com.example.mjet.ui.fragments.habitlist.HabitList
 import com.example.mjet.ui.fragments.habitlist.HabitListDirections
 import com.example.mjet.utils.Calculations
+import com.maltaisn.icondialog.pack.IconPack
 import kotlinx.android.synthetic.main.recycler_habit_item.view.*
 
-class HabitListAdapter:RecyclerView.Adapter<HabitListAdapter.MyViewHolder>(){
+class HabitListAdapter(val iconDialogIconPack: IconPack?) :RecyclerView.Adapter<HabitListAdapter.MyViewHolder>(){
     var habilist= emptyList<Habit>()
     val TAG="HabitListAdapter"
     override fun onCreateViewHolder(
@@ -38,13 +38,21 @@ class HabitListAdapter:RecyclerView.Adapter<HabitListAdapter.MyViewHolder>(){
     }
 
     override fun onBindViewHolder(holder: HabitListAdapter.MyViewHolder, position: Int) {
-       val currentHabit=habilist[position]
+
+
+        val currentHabit=habilist[position]
         holder.itemView.iv_habit_icon.setImageResource(currentHabit.imageId)
         holder.itemView.tv_item_description.text = currentHabit.habit_description
         holder.itemView.tv_timeElapsed.text =
             Calculations.calculateTimeBetweenDates(currentHabit.habit_startTime)
         holder.itemView.tv_item_createdTimeStamp.text = "Since: ${currentHabit.habit_startTime}"
         holder.itemView.tv_item_title.text = "${currentHabit.habit_title}"
+        currentHabit.icon.let {
+            val icon = it?.let { it1 -> this.iconDialogIconPack?.getIcon(it1) }
+            val drawable= icon?.drawable
+            holder.itemView.iv_habit_new_icon.setImageDrawable(drawable)
+        }
+
     }
     fun setData(habits: List<Habit>) {
         this.habilist = habits

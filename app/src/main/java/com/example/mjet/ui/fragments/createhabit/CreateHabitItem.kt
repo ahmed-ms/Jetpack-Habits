@@ -9,63 +9,70 @@ import android.view.View
 import android.widget.DatePicker
 import android.widget.TimePicker
 import android.widget.Toast
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.mjet.R
 import com.example.mjet.data.models.Habit
-import com.example.mjet.ui.viewmodels.HabitViewModels
 import com.example.mjet.utils.ActionFragment
 import com.example.mjet.utils.Calculations
+import com.maltaisn.icondialog.IconDialog
+import com.maltaisn.icondialog.IconDialogSettings
+import com.maltaisn.icondialog.data.Icon
 import kotlinx.android.synthetic.main.fragment_create_habit_item.*
 import java.util.*
-class CreateHabitItem : ActionFragment(R.layout.fragment_create_habit_item) ,
-    TimePickerDialog.OnTimeSetListener,
-DatePickerDialog.OnDateSetListener{
 
+class CreateHabitItem : ActionFragment(R.layout.fragment_create_habit_item),
+    TimePickerDialog.OnTimeSetListener,
+    DatePickerDialog.OnDateSetListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         btn_confirm.setOnClickListener {
-           addHabitToDB()
+            addHabitToDB()
         }
         //Pick a date and time
         pickDateAndTime()
 
         //Selected and image to put into our list
         drawableSelectedFun()
-    }
-    private fun addHabitToDB() {
 
+        // If dialog is already added to fragment manager, get it. If not, create a new instance.
+        val iconDialog =
+            this.childFragmentManager.findFragmentByTag(ActionFragment.ICON_DIALOG_TAG) as IconDialog?
+                ?: IconDialog.newInstance(IconDialogSettings())
+
+        btn_pickIcon.setOnClickListener {
+            iconDialog.show(childFragmentManager, ICON_DIALOG_TAG)
+
+        }
+    }
+
+    private fun addHabitToDB() {
         //Get text from editTexts
         title = et_habitTitle.text.toString()
         description = et_habitDescription.text.toString()
-
         //Create a timestamp string for our recyclerview
         timeStamp = "$cleanDate $cleanTime"
-
         //Check that the form is complete before submitting data to the database
         if (!(title.isEmpty() || description.isEmpty() || timeStamp.isEmpty() || drawableSelected == 0)) {
-            val habit = Habit(0, title, description, timeStamp, drawableSelected)
-
+            val habit = Habit(0, iconID, title, description, timeStamp, drawableSelected)
             //add the habit if all the fields are filled
             habitViewModel.addHabit(habit)
             Toast.makeText(context, "Habit created successfully!", Toast.LENGTH_SHORT).show()
-
             //navigate back to our home fragment
             findNavController().navigateUp()
         } else {
             Toast.makeText(context, "Please fill all the fields", Toast.LENGTH_SHORT).show()
         }
     }
+
     private fun drawableSelectedFun() {
-       iv_fastFoodSelected.setOnClickListener{
-           iv_fastFoodSelected.isSelected = !iv_fastFoodSelected.isSelected
-           drawableSelected=R.drawable.ic_fastfood
-           //de-select the other options when we pick an image
-           iv_smokingSelected.isSelected = false
-           iv_teaSelected.isSelected = false
+        iv_fastFoodSelected.setOnClickListener {
+            iv_fastFoodSelected.isSelected = !iv_fastFoodSelected.isSelected
+            drawableSelected = R.drawable.ic_fastfood
+            //de-select the other options when we pick an image
+            iv_smokingSelected.isSelected = false
+            iv_teaSelected.isSelected = false
 
 
-       }
+        }
         iv_smokingSelected.setOnClickListener {
             iv_smokingSelected.isSelected = !iv_smokingSelected.isSelected
             drawableSelected = R.drawable.ic_smoking2
@@ -86,9 +93,7 @@ DatePickerDialog.OnDateSetListener{
     }
 
 
-
-
-   // @RequiresApi(Build.VERSION_CODES.N)
+    // @RequiresApi(Build.VERSION_CODES.N)
     //set on click listeners for our data and time pickers
     private fun pickDateAndTime() {
         btn_pickDate.setOnClickListener {
@@ -131,4 +136,16 @@ DatePickerDialog.OnDateSetListener{
     }
 
 
+    override fun onIconDialogIconsSelected(dialog: IconDialog, icons: List<Icon>) {
+        "Icon: ${icons[0].tags[0]} ".also { tv_iconSelected.text = it }
+        val iconIds = icons.map { it.id }
+        val pack = iconDialogIconPack
+        val icon = pack?.getIcon(iconIds[0])
+        iconID = iconIds[0]
+        icon.let {
+            if (it != null) {
+                selectedIconView.setImageDrawable(it.drawable)
+            }
+        }
+    }
 }

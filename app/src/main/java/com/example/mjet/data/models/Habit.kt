@@ -10,6 +10,7 @@ import kotlinx.android.parcel.Parcelize
 data class Habit(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
+    val icon: Int?,
     val habit_title: String,
     val habit_description: String,
     val habit_startTime: String,
